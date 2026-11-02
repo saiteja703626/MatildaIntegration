@@ -1,0 +1,113 @@
+
+/* 1. Basic page settings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f5f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 2. Main chat container */
+.chat-container {
+    width: 90%;
+    max-width: 750px;
+    height: 85vh;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 3. Chat header */
+.chat-header {
+    background-color: #173f35;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.chat-header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.chat-header p {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* 4. Message area */
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 5. Individual messages */
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+.assistant-message {
+    background-color: #edf1ef;
+    color: #222;
+    align-self: flex-start;
+}
+
+.user-message {
+    background-color: #173f35;
+    color: white;
+    align-self: flex-end;
+}
+
+/* 6. Message input area */
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+.chat-input-area input:focus {
+    border-color: #173f35;
+}
+
+.chat-input-area button {
+    padding: 12px 22px;
+    background-color: #173f35;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.chat-input-area button:hover {
+    background-color: #245c4d;
+}

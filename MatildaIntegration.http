@@ -1,0 +1,6 @@
+@MatildaIntegration_HostAddress = http://localhost:5144
+
+GET {{MatildaIntegration_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
