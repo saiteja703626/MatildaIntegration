@@ -1,4 +1,7 @@
 
+// Store the conversation history
+const conversationHistory = [];
+
 // Find the HTML elements we need
 const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
@@ -25,18 +28,29 @@ chatForm.addEventListener("submit", async function (event) {
     userInput.value = "";
 
     // Display a temporary message
-    const loadingMessage = addMessage("Matilda is thinking...");
+    const loadingMessage = addMessage(
+        "Matilda is thinking...", "assistant"
+    );
 
     try {
 
-        // Send the question to our C# backend
+        // Prepare the complete conversation
+        const messages = [
+            ...conversationHistory,
+            {
+                role: "user",
+                content: message
+            }
+        ];
+
+        // Send the conversation to our C# backend
         const response = await fetch("/matilda/ask", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                message: message
+                messages: messages
             })
         });
 
@@ -50,6 +64,18 @@ chatForm.addEventListener("submit", async function (event) {
 
         // Display Matilda's answer
         loadingMessage.textContent = data.answer;
+
+        // Save the successful exchange in conversation history
+        conversationHistory.push(
+            {
+                role: "user",
+                content: message
+            },
+            {
+                role: "assistant",
+                content: data.answer
+            }
+        );
 
     } catch (error) {
 

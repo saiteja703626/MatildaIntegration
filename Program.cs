@@ -28,7 +28,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -80,18 +80,80 @@ app.MapPost("/matilda/ask", async (
             statusCode: 500);
     }
 
+
+    // Validate the conversation
+    if (request.Messages is null || request.Messages.Count == 0)
+    {
+        return Results.BadRequest(new
+        {
+            error = "Conversation cannot be empty."
+        });
+    }
+
+    // Limit the number of messages
+    if (request.Messages.Count > 50)
+    {
+        return Results.BadRequest(new
+        {
+            error = "Conversation cannot contain more than 50 messages."
+        });
+    }
+
+    // Validate individual messages
+    foreach (var message in request.Messages)
+    {
+        if (message is null)
+        {
+            return Results.BadRequest(new
+            {
+                error = "Message cannot be null."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(message.Content))
+        {
+            return Results.BadRequest(new
+            {
+                error = "Message content cannot be empty."
+            });
+        }
+
+        if (message.Content.Length > 4000)
+        {
+            return Results.BadRequest(new
+            {
+                error = "Message cannot exceed 4000 characters."
+            });
+        }
+
+        if (message.Role != "user" && message.Role != "assistant")
+        {
+            return Results.BadRequest(new
+            {
+                error = "Invalid message role."
+            });
+        }
+    }
+
+    // The latest message must come from the user
+    if (request.Messages[^1].Role != "user")
+    {
+        return Results.BadRequest(new
+        {
+            error = "The latest message must be from the user."
+        });
+    }
+
+
     // 2. Prepare the question
     var payload = new
     {
         model = "matilda",
-        messages = new[]
+        messages = request.Messages.Select(message => new
         {
-            new
-            {
-                role = "user",
-                content = request.Message
-            }
-        }
+            role = message.Role,
+            content = message.Content
+        }).ToArray()
     };
 
     // 3. Create an HTTP request
@@ -142,7 +204,14 @@ app.MapPost("/matilda/ask", async (
 
 app.Run();
 
-public record ChatRequest(string Message);
+//Instead of sending just one question, we can now send the entire conversation.
+//example
+//new ChatMessage("user", "What is C#?"),
+//new ChatMessage("assistant", "C# is a programming language."),
+//new ChatMessage("user", "Who developed it?")
+public record ChatRequest(List<ChatMessage> Messages);
+public record ChatMessage(string Role, string Content);
+
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
