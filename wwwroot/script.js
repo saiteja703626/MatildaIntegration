@@ -6,6 +6,7 @@ const conversationHistory = [];
 const chatForm = document.getElementById("chat-form");
 const userInput = document.getElementById("user-input");
 const chatMessages = document.getElementById("chat-messages");
+const submitButton = chatForm.querySelector('button[type="submit"]');
 
 // Listen for the user submitting the form
 chatForm.addEventListener("submit", async function (event) {
@@ -34,9 +35,9 @@ chatForm.addEventListener("submit", async function (event) {
 
     try {
 
-        // Prepare the complete conversation
+        // Prepare the complete conversation and removed limit of 50 messages
         const messages = [
-            ...conversationHistory,
+            ...conversationHistory.slice(-48),
             {
                 role: "user",
                 content: message
@@ -54,13 +55,26 @@ chatForm.addEventListener("submit", async function (event) {
             })
         });
 
-        // Convert the response into JavaScript data
-        const data = await response.json();
+
+        // Read the response as plain text first
+        const responseText = await response.text();
+
+        let data;
+
+        try {
+            // Convert the response text into JavaScript data
+            data = JSON.parse(responseText);
+        }
+        catch {
+            // Handle responses that are not valid JSON
+            throw new Error("The server returned an invalid response. Please try again later.");
+        }
 
         // Check whether the request was successful
         if (!response.ok) {
-            throw new Error(data.error || "Something went wrong.");
+            throw new Error(data.error || "Something went wrong. Please try again.");
         }
+
 
         // Display Matilda's answer
         loadingMessage.textContent = data.answer;
