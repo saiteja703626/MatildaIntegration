@@ -1,13 +1,62 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddHttpClient();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LoungePolicy", policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://saitejar.com",
+                "https://www.saitejar.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+//Rate limiting — 10 requests per minute per client IP
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+{
+    context.HttpContext.Response.ContentType = "application/json";
+
+    await context.HttpContext.Response.WriteAsJsonAsync(new
+    {
+        error = "Too many requests. Please try again later."
+    }, cancellationToken);
+};
+
+    options.AddPolicy("MatildaPolicy", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+});
+
+
+
+builder.Services.AddHttpClient("Matilda", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -20,6 +69,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("LoungePolicy");  //Enable the CORS middleware here
+app.UseRateLimiter();
 
 var summaries = new[]
 {
@@ -168,38 +219,61 @@ app.MapPost("/matilda/ask", async (
     // 5. Attach the question as JSON
     httpRequest.Content = JsonContent.Create(payload);
 
-    // 6. Send the request to Matilda
-    var client = httpClientFactory.CreateClient();
+    try
+    {
+        // 6. Send the request to Matilda
+        var client = httpClientFactory.CreateClient("Matilda");
 
-    using var response = await client.SendAsync(httpRequest);
+        using var response = await client.SendAsync(httpRequest);
 
-    // 7. Read Matilda's response
-    var responseBody = await response.Content.ReadAsStringAsync();
+        // 7. Read Matilda's response
+        var responseBody = await response.Content.ReadAsStringAsync();
 
-    // 8. Check whether the request succeeded
-    if (!response.IsSuccessStatusCode)
+        // 8. Check whether the request succeeded
+        if (!response.IsSuccessStatusCode)
+        {
+            return Results.Json(
+                new { error = responseBody },
+                statusCode: (int)response.StatusCode);
+        }
+
+        // 9. Extract the AI-generated answer
+        using var jsonDocument = JsonDocument.Parse(responseBody);
+
+        var choices = jsonDocument.RootElement.GetProperty("choices");
+
+        var answer = choices[0]
+            .GetProperty("message")
+            .GetProperty("content")
+            .GetString();
+
+        // 10. Return the answer
+        return Results.Json(new
+        {
+            answer = answer
+        });
+    }
+    catch (HttpRequestException)
     {
         return Results.Json(
-            new { error = responseBody },
-            statusCode: (int)response.StatusCode);
+            new { error = "Unable to connect to Matilda. Please try again later." },
+            statusCode: 503);
     }
-
-    // 9. Extract the AI-generated answer
-    using var jsonDocument = JsonDocument.Parse(responseBody);
-
-    var choices = jsonDocument.RootElement.GetProperty("choices");
-
-    var answer = choices[0]
-        .GetProperty("message")
-        .GetProperty("content")
-        .GetString();
-
-    // 10. Return the answer
-    return Results.Json(new
+    catch (JsonException)
     {
-        answer = answer
-    });
-});
+        return Results.Json(
+            new { error = "Matilda returned an invalid response. Please try again later." },
+            statusCode: 502);
+    }
+    catch (TaskCanceledException)
+    {
+        return Results.Json(
+            new { error = "Matilda took too long to respond. Please try again later." },
+            statusCode: 504);
+    }
+})
+.RequireRateLimiting("MatildaPolicy");
+
 
 
 app.Run();
