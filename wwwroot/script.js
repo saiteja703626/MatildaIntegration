@@ -8,11 +8,17 @@ const userInput = document.getElementById("user-input");
 const chatMessages = document.getElementById("chat-messages");
 const submitButton = chatForm.querySelector('button[type="submit"]');
 
+let isSubmitting = false;
+
 // Listen for the user submitting the form
 chatForm.addEventListener("submit", async function (event) {
 
     // Prevent the browser from refreshing the page
     event.preventDefault();
+    // Prevent another request while one is already processing
+    if (isSubmitting) {
+        return;
+    }
 
     // Get the question typed by the user
     const message = userInput.value.trim();
@@ -21,7 +27,10 @@ chatForm.addEventListener("submit", async function (event) {
     if (message === "") {
         return;
     }
-
+    // Mark the form as busy
+    isSubmitting = true;
+    // Disable the Send button
+    submitButton.disabled = true;
     // Display the user's question
     addMessage(message, "user");
 
@@ -30,7 +39,7 @@ chatForm.addEventListener("submit", async function (event) {
 
     // Display a temporary message
     const loadingMessage = addMessage(
-        "Matilda is thinking...", "assistant"
+        "S-AI is thinking...", "assistant"
     );
 
     try {
@@ -95,6 +104,14 @@ chatForm.addEventListener("submit", async function (event) {
 
         // Display an error if something goes wrong
         loadingMessage.textContent = "Error: " + error.message;
+
+    } finally {
+
+        // Mark the form as available again
+        isSubmitting = false;
+
+        // Enable the Send button
+        submitButton.disabled = false;
 
     }
 

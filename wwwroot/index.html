@@ -6,43 +6,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Matilda AI Assistant</title>
+    <meta name="description"
+        content="S-AI is an AI conversational assistant built by integrating Maincode's Matilda AI API into an ASP.NET Core application.">
+
+    <title>S-AI | AI Assistant</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="chat-container">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="brand">
+            <span class="brand-icon">S</span>
+            <span>S-AI</span>
+        </a>
 
-        <header class="chat-header">
-            <h1>Matilda AI Assistant</h1>
-            <p>Powered by Maincode</p>
-        </header>
+        <span class="nav-label">AI Integration Project</span>
+    </nav>
 
-        <main id="chat-messages" class="chat-messages">
 
-            <div class="message assistant-message">
-                Hi! I'm Matilda. How can I help you today?
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+
+            <div class="eyebrow">
+                <span class="status-dot"></span>
+                AI-POWERED APPLICATION
             </div>
 
-        </main>
+            <h1>
+                Meet <span class="highlight">S-AI.</span>
+                <br>
+                Intelligence, integrated.
+            </h1>
 
-        <form id="chat-form" class="chat-input-area">
+            <p class="hero-description">
+                S-AI is a conversational AI application developed by integrating
+                Maincode's Matilda AI API into an ASP.NET Core application.
 
-            <input
-                type="text"
-                id="user-input"
-                placeholder="Type your message..."
-                autocomplete="off"
-                required
-            >
+                It demonstrates how an external AI service can be connected
+                to a custom backend and delivered through an interactive web interface.
+            </p>
 
-            <button type="submit">Send</button>
+            <div class="technology-tags">
+                <span>ASP.NET Core</span>
+                <span>C#</span>
+                <span>JavaScript</span>
+                <span>Matilda AI API</span>
+            </div>
 
-        </form>
+        </section>
 
-    </div>
+
+        <!-- Chat Section -->
+        <section class="chat-section" id="chat">
+
+            <div class="chat-section-header">
+                <div>
+                    <span class="section-label">INTERACTIVE DEMO</span>
+                    <h2>Chat with S-AI</h2>
+                    <p>Ask a question and explore the AI integration.</p>
+                </div>
+
+                <div class="online-status">
+                    <span class="status-dot"></span>
+                    Ready
+                </div>
+            </div>
+
+
+            <!-- Existing chat interface -->
+            <div class="chat-container">
+
+                <header class="chat-header">
+                    <div class="assistant-avatar">S</div>
+
+                    <div class="assistant-info">
+                        <h3>S-AI Assistant</h3>
+                        <p>Powered by Maincode Matilda</p>
+                    </div>
+                </header>
+
+
+                <main id="chat-messages" class="chat-messages">
+
+                    <div class="message assistant-message">
+                        Hi! I'm S-AI. How can I help you today?
+                    </div>
+
+                </main>
+
+
+                <form id="chat-form" class="chat-input-area">
+
+                    <input
+                        type="text"
+                        id="user-input"
+                        placeholder="Ask S-AI anything..."
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button type="submit">Send ↗</button>
+
+                </form>
+
+                <p class="chat-disclaimer">
+                    S-AI uses Maincode's Matilda AI service to generate responses.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Development Highlights -->
+        <section class="highlights-section">
+
+            <div class="section-heading">
+                <span class="section-label">UNDER THE HOOD</span>
+                <h2>Built beyond the chat window.</h2>
+                <p>
+                    The project focuses on backend integration, application
+                    security, request management and reliable communication
+                    with an external AI service.
+                </p>
+            </div>
+
+
+            <div class="highlights-grid">
+
+                <article class="highlight-card">
+                    <div class="card-number">01</div>
+                    <h3>AI API Integration</h3>
+                    <p>
+                        Connected Maincode's Matilda AI API to an ASP.NET Core
+                        backend using HttpClient.
+                    </p>
+                </article>
+
+
+                <article class="highlight-card">
+                    <div class="card-number">02</div>
+                    <h3>Secure Configuration</h3>
+                    <p>
+                        Configured API credentials using ASP.NET Core
+                        User Secrets to keep sensitive information server-side.
+                    </p>
+                </article>
+
+
+                <article class="highlight-card">
+                    <div class="card-number">03</div>
+                    <h3>Conversation Management</h3>
+                    <p>
+                        Implemented conversation history to maintain context
+                        across successive messages.
+                    </p>
+                </article>
+
+
+                <article class="highlight-card">
+                    <div class="card-number">04</div>
+                    <h3>Input Validation</h3>
+                    <p>
+                        Added message validation, role restrictions and
+                        request size limits.
+                    </p>
+                </article>
+
+
+                <article class="highlight-card">
+                    <div class="card-number">05</div>
+                    <h3>Rate Limiting</h3>
+                    <p>
+                        Implemented request rate limiting to help protect
+                        the application against excessive requests.
+                    </p>
+                </article>
+
+
+                <article class="highlight-card">
+                    <div class="card-number">06</div>
+                    <h3>Error Handling</h3>
+                    <p>
+                        Added handling for API failures, HTTP errors,
+                        invalid responses and request timeouts.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- Technology Stack -->
+        <section class="stack-section">
+
+            <span class="section-label">TECHNOLOGY STACK</span>
+            <h2>What powers S-AI?</h2>
+
+            <div class="stack-list">
+                <span>C#</span>
+                <span>ASP.NET Core</span>
+                <span>JavaScript</span>
+                <span>HTML5</span>
+                <span>CSS3</span>
+                <span>REST API</span>
+                <span>JSON</span>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Designed and developed by Saiteja.</p>
+        <p>S-AI · An AI integration project</p>
+    </footer>
+
 
     <script src="script.js"></script>
 
